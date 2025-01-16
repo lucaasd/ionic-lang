@@ -25,7 +25,8 @@ public class IonicVM
         currentFrame = mainFrame;
         opcodeActionDictionary = new()
         {
-            {Instruction.PUSH, ExecutePush}
+            {Instruction.PUSH, ExecutePush},
+            {Instruction.SUM, ExecuteSum}
         };
     }
 
@@ -131,6 +132,17 @@ public class IonicVM
         {
             currentFrame.Stack.Push(value);
         }
+        programCounter++;
+    }
+
+    private void ExecuteSum(byte[] _)
+    {
+        byte finalValue = 0;
+        foreach (var value in currentFrame.Stack.ToArray())
+        {
+            finalValue += value;
+        }
+        currentFrame.Stack.Push(finalValue);
         programCounter++;
     }
 }
