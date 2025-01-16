@@ -16,6 +16,9 @@ public class IonicVM
 
     private Dictionary<Instruction, Action<byte[]>> opcodeActionDictionary;
     private int programCounter;
+    private int currentTypeIndex;
+
+    public int CurrentTypeIndex => currentTypeIndex;
 
     public Stack<byte>? Stack => currentFrame?.Stack;
 
@@ -26,7 +29,8 @@ public class IonicVM
         opcodeActionDictionary = new()
         {
             {Instruction.PUSH, ExecutePush},
-            {Instruction.SUM, ExecuteSum}
+            {Instruction.SUM, ExecuteSum},
+            {Instruction.AS, ExecuteAs}
         };
     }
 
@@ -143,6 +147,20 @@ public class IonicVM
             finalValue += value;
         }
         currentFrame.Stack.Push(finalValue);
+        programCounter++;
+    }
+
+    private void ExecuteAs(byte[] bytes)
+    {
+        try
+        {
+            int index = BitConverter.ToInt32(bytes);
+            currentTypeIndex = index;
+        }
+        catch (Exception exception)
+        {
+            throw new Exception($"Failed to convert bytes to {typeof(int).FullName}. cause: {exception.Message}");
+        }
         programCounter++;
     }
 }
