@@ -1,7 +1,7 @@
 using VM.AssemblyInfo;
 using VM.Instructions;
 
-namespace VM.VirtualMachine.Runtime;
+namespace VM.Runtime;
 
 public class Function(string name, Descriptor descriptor)
 {
