@@ -4,13 +4,13 @@ public enum Instruction
 {
     PUSH,
     NOP,
-    POP,
     SUM,
     PRINT,
     GOTO,
-    ISTORE,
+    STORE,
     LOAD,
     RETURN,
     END,
-    INVOKE
+    INVOKE,
+    AS,
 }
