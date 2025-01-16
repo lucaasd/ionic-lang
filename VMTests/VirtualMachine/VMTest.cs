@@ -47,4 +47,17 @@ public class VMTest
         byte expected = 10;
         Assert.That(vm.Stack?.ToArray()[0], Is.EqualTo(expected));
     }
+
+    [Test]
+    public void TestAs()
+    {
+        var vm = new IonicVM();
+        List<IByteCodePart> code = [
+            new Operation(Instruction.AS, BitConverter.GetBytes(1), typeof(byte[]))
+        ];
+
+        vm.LoadCode(code);
+        vm.Run();
+        Assert.That(vm.CurrentTypeIndex, Is.EqualTo(1));
+    }
 }
