@@ -3,6 +3,8 @@ using VM.Instructions;
 using VM.Instructions.Declarations;
 using VM.AssemblyInfo.Validation;
 using VM.Runtime;
+using System.Runtime.InteropServices;
+using VM.Memory;
 
 namespace VM.VirtualMachine;
 
@@ -15,10 +17,12 @@ public class IonicVM
     private Function? currentFunction;
 
     private Dictionary<Instruction, Action<byte[]>> opcodeActionDictionary;
+    private List<Type> primitiveTypes = [typeof(byte), typeof(short), typeof(int), typeof(long)];
     private int programCounter;
     private int currentTypeIndex;
 
-    public int CurrentTypeIndex => currentTypeIndex;
+    public int CurrentTypeIndex { get => currentTypeIndex; set => currentTypeIndex = value; }
+    public Frame CurrentFrame => currentFrame;
 
     public Stack<byte>? Stack => currentFrame?.Stack;
 
@@ -30,7 +34,8 @@ public class IonicVM
         {
             {Instruction.PUSH, ExecutePush},
             {Instruction.SUM, ExecuteSum},
-            {Instruction.AS, ExecuteAs}
+            {Instruction.AS, ExecuteAs},
+            {Instruction.STORE, ExecuteStore}
         };
     }
 
@@ -161,6 +166,27 @@ public class IonicVM
         {
             throw new Exception($"Failed to convert bytes to {typeof(int).FullName}. cause: {exception.Message}");
         }
+        programCounter++;
+    }
+
+    private void ExecuteStore(byte[] bytes)
+    {
+
+        int index = BitConverter.ToInt32(bytes);
+        int size = Marshal.SizeOf(primitiveTypes[index]);
+
+        if (bytes.Length != size)
+        {
+            throw new Exception("Value size and type size must be the same!");
+        }
+
+        var objRef = new VariableObjectRef(index, index + size);
+        currentFrame.Variables.Add(new Variable(index, primitiveTypes[index]));
+        foreach (var value in bytes)
+        {
+            currentFrame.VariableMemory.Add(value);
+        }
+
         programCounter++;
     }
 }

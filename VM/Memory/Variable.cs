@@ -1,13 +1,12 @@
 namespace VM.Memory;
 
-public struct Variable(long id, Type type, long value)
+public struct Variable(int id, Type type)
 {
-    public long ID { get; } = id;
+    public int ID { get; } = id;
     public Type Type { get; } = type;
-    public long Value { get; } = value;
 
     public override string ToString()
     {
-        return $"Variable {{ ID: {ID}, Type: {Type}, Value: {Value} }}";
+        return $"Variable {{ ID: {ID}, Type: {Type} }}";
     }
 }
