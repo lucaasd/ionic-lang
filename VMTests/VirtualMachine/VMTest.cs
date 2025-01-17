@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices.Marshalling;
 using System.Security.Cryptography;
+using System.Security.Permissions;
 using VM.Instructions;
 using VM.VirtualMachine;
 
@@ -59,5 +61,24 @@ public class VMTest
         vm.LoadCode(code);
         vm.Run();
         Assert.That(vm.CurrentTypeIndex, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void TestStore()
+    {
+        var vm = new IonicVM();
+        List<IByteCodePart> code = [
+            new Operation(Instruction.STORE, BitConverter.GetBytes(2), typeof(byte[]))
+        ];
+
+        vm.LoadCode(code);
+        vm.Run();
+        Assert.Multiple(() =>
+        {
+            Assert.That(vm.CurrentFrame.VariableMemory.Take(4).ToArray(), Is.EqualTo(BitConverter.GetBytes(2)));
+            Assert.That(vm.CurrentFrame.Variables.Where((variable) => variable.ID == 2), Is.Not.Null);
+            Assert.That(vm.CurrentFrame.Variables.Count, Is.EqualTo(1));
+        });
+
     }
 }
