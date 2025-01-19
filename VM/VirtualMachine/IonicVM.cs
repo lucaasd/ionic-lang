@@ -5,6 +5,7 @@ using VM.AssemblyInfo.Validation;
 using VM.Runtime;
 using System.Runtime.InteropServices;
 using VM.Memory;
+using VM.Extensions;
 
 namespace VM.VirtualMachine;
 
@@ -41,7 +42,7 @@ public class IonicVM
 
     public string ConvertCodeToHumanIL()
     {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
         foreach (var instruction in code)
         {
             stringBuilder.AppendLine(instruction.ToString());
@@ -182,10 +183,11 @@ public class IonicVM
 
         var objRef = new VariableObjectRef(index, index + size);
         currentFrame.Variables.Add(new Variable(index, primitiveTypes[index]));
-        foreach (var value in bytes)
+        foreach (var value in currentFrame.Stack.ToArray().Take(4))
         {
             currentFrame.VariableMemory.Add(value);
         }
+        currentFrame.Stack.Pop(4);
 
         programCounter++;
     }
