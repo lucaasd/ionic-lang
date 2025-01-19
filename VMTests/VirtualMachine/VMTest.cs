@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Security.Permissions;
 using VM.Instructions;
 using VM.VirtualMachine;
+using System.Linq;
 
 namespace VMTests.VirtualMachine;
 
@@ -68,6 +69,7 @@ public class VMTest
     {
         var vm = new IonicVM();
         List<IByteCodePart> code = [
+            new Operation(Instruction.PUSH, BitConverter.GetBytes(4), typeof(byte[])),
             new Operation(Instruction.STORE, BitConverter.GetBytes(2), typeof(byte[]))
         ];
 
@@ -75,10 +77,19 @@ public class VMTest
         vm.Run();
         Assert.Multiple(() =>
         {
-            Assert.That(vm.CurrentFrame.VariableMemory.Take(4).ToArray(), Is.EqualTo(BitConverter.GetBytes(2)));
+            Assert.That(vm.CurrentFrame.VariableMemory.AsEnumerable().Reverse(), Is.EqualTo(BitConverter.GetBytes(4)));
             Assert.That(vm.CurrentFrame.Variables.Where((variable) => variable.ID == 2), Is.Not.Null);
             Assert.That(vm.CurrentFrame.Variables.Count, Is.EqualTo(1));
         });
 
+    }
+
+    [Test]
+    public void TestStoreWithAs()
+    {
+        var vm = new IonicVM();
+        List<IByteCodePart> code = [
+            new Operation(Instruction.AS, BitConverter.GetBytes((long)4), typeof(byte[])),
+        ];
     }
 }
