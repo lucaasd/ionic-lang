@@ -5,7 +5,6 @@ public enum Instruction
     PUSH,
     NOP,
     SUM,
-    PRINT,
     GOTO,
     STORE,
     LOAD,
@@ -13,4 +12,5 @@ public enum Instruction
     END,
     INVOKE,
     AS,
+    WRITE_STD
 }

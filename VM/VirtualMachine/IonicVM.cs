@@ -6,6 +6,7 @@ using VM.Runtime;
 using System.Runtime.InteropServices;
 using VM.Memory;
 using VM.Extensions;
+using VM.Configuration;
 
 namespace VM.VirtualMachine;
 
@@ -25,7 +26,20 @@ public class IonicVM
     public int CurrentTypeIndex { get => currentTypeIndex; set => currentTypeIndex = value; }
     public Frame CurrentFrame => currentFrame;
 
+    private Stream stdoutStream;
+    private Stream stderrStream;
+    private Stream stdinStream;
+
     public Stack<byte>? Stack => currentFrame?.Stack;
+
+    public static IonicVM CreateVM(VMBuilder builder)
+    {
+        return new IonicVM()
+        {
+            stderrStream = builder.StderrStream,
+            stdoutStream = builder.StdoutStream
+        };
+    }
 
     public IonicVM()
     {
@@ -36,7 +50,8 @@ public class IonicVM
             {Instruction.PUSH, ExecutePush},
             {Instruction.SUM, ExecuteSum},
             {Instruction.AS, ExecuteAs},
-            {Instruction.STORE, ExecuteStore}
+            {Instruction.STORE, ExecuteStore},
+            {Instruction.WRITE_STD, ExecuteWriteToStd}
         };
     }
 
@@ -174,21 +189,62 @@ public class IonicVM
     {
 
         int index = BitConverter.ToInt32(bytes);
-        int size = Marshal.SizeOf(primitiveTypes[index]);
+        int size = Marshal.SizeOf(primitiveTypes[currentTypeIndex]);
 
-        if (bytes.Length != size)
+        Console.WriteLine($"data size: {currentFrame.Stack.Count} type size: {size}");
+
+        if (currentFrame.Stack.Count != size)
         {
             throw new Exception("Value size and type size must be the same!");
         }
 
         var objRef = new VariableObjectRef(index, index + size);
         currentFrame.Variables.Add(new Variable(index, primitiveTypes[index]));
-        foreach (var value in currentFrame.Stack.ToArray().Take(4))
+        foreach (var value in currentFrame.Stack.ToArray().Reverse())
         {
             currentFrame.VariableMemory.Add(value);
         }
-        currentFrame.Stack.Pop(4);
+        currentFrame.Stack.Pop(size);
 
+        programCounter++;
+    }
+
+    private void ExecuteWriteToStd(byte[] bytes)
+    {
+        byte target = bytes[0];
+
+        static void WriteToStdout(byte[] data, Stream output)
+        {
+            output.Write(data);
+        }
+
+        static void WriteToStderr(byte[] data, Stream output)
+        {
+            output.Write(data);
+        }
+
+        static void WriteToStdin(byte[] data, Stream output)
+        {
+            output.Write(data);
+        }
+
+        var data = currentFrame.Stack.ToArray();
+
+        Action[] targetFunctionArray = [
+            () => {
+                WriteToStdout([..currentFrame.Stack.Reverse()], stdoutStream);
+            },
+            () => {
+                WriteToStderr([..currentFrame.Stack.Reverse()], stderrStream);
+            },
+            () => {
+                WriteToStdin([..currentFrame.Stack.Reverse()], stdinStream);
+            }
+        ];
+
+        targetFunctionArray[target]();
+        int count = currentFrame.Stack.Count;
+        currentFrame.Stack.Pop(count);
         programCounter++;
     }
 }

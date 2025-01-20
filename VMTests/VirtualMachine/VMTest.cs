@@ -4,6 +4,7 @@ using System.Security.Permissions;
 using VM.Instructions;
 using VM.VirtualMachine;
 using System.Linq;
+using VM.Configuration;
 
 namespace VMTests.VirtualMachine;
 
@@ -88,8 +89,30 @@ public class VMTest
     public void TestStoreWithAs()
     {
         var vm = new IonicVM();
+
+        long number = 4;
+        int type = 3;
+        int index = 0;
+
         List<IByteCodePart> code = [
-            new Operation(Instruction.AS, BitConverter.GetBytes((long)4), typeof(byte[])),
+            new Operation(Instruction.PUSH, BitConverter.GetBytes(number), typeof(byte[])),
+            new Operation(Instruction.AS, BitConverter.GetBytes(type), typeof(byte[])),
+            new Operation(Instruction.STORE, BitConverter.GetBytes(index), typeof(byte[]))
         ];
+
+        vm.LoadCode(code);
+        vm.Run();
+
+        byte[] numberBytes = BitConverter.GetBytes(number);
+
+        Console.WriteLine(string.Join(", ", vm.CurrentFrame.VariableMemory));
+        Console.WriteLine(string.Join(", ", numberBytes));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(vm.CurrentFrame.VariableMemory.ToArray(), Is.EqualTo(numberBytes));
+            Assert.That(vm.CurrentFrame.Variables.Where((variable) => variable.ID == 0 && variable.Type == typeof(long)), Is.Not.Null);
+            Assert.That(vm.CurrentFrame.Variables.Count, Is.EqualTo(1));
+        });
     }
 }
