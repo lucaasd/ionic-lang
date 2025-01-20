@@ -75,10 +75,11 @@ public class VMTest
         ];
 
         vm.LoadCode(code);
+        vm.CurrentTypeIndex = 2;
         vm.Run();
         Assert.Multiple(() =>
         {
-            Assert.That(vm.CurrentFrame.VariableMemory.AsEnumerable().Reverse(), Is.EqualTo(BitConverter.GetBytes(4)));
+            Assert.That(vm.CurrentFrame.VariableMemory, Is.EqualTo(BitConverter.GetBytes(4)));
             Assert.That(vm.CurrentFrame.Variables.Where((variable) => variable.ID == 2), Is.Not.Null);
             Assert.That(vm.CurrentFrame.Variables.Count, Is.EqualTo(1));
         });
