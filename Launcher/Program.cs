@@ -1,19 +1,30 @@
-using System.Text;
+using CommandLine;
+using Launcher.CLI;
+using VM.Code;
 using VM.Configuration;
 using VM.Instructions;
 using VM.VirtualMachine;
 
-var code = new List<IByteCodePart> {
-    new Operation(Instruction.PUSH, Encoding.UTF8.GetBytes("Hello, World!\n"), typeof(byte[])),
-    new Operation(Instruction.WRITE_STD, [0], typeof(byte[]))
-};
+namespace Launcher;
 
-var builder = new VMBuilder()
-    .ConfigureStdinStream(Console.OpenStandardInput())
-    .ConfigureStdoutStream(Console.OpenStandardOutput())
-    .ConfigureStderrStream(Console.OpenStandardError());
+public class LauncherMain
+{
+    public static void Main(string[] args)
+    {
+        var parser = new Parser();
+        var options = parser.ParseArguments<Options>(args).Value;
+        var lexer = new Lexer(File.ReadAllText(options.Path) + "\0");
+        lexer.Tokenize();
+        Console.WriteLine(string.Join<Token>('\n', lexer.GetTokens()));
+        var converter = new Converter(lexer.GetTokens());
+        converter.Convert();
+        var builder = VMBuilder.CreateBuilder()
+            .ConfigureStdinStream(Console.OpenStandardInput())
+            .ConfigureStdoutStream(Console.OpenStandardOutput())
+            .ConfigureStderrStream(Console.OpenStandardError());
 
-var vm = IonicVM.CreateVM(builder);
-
-vm.LoadCode(code);
-vm.Run();
+        var vm = IonicVM.CreateVM(builder);
+        vm.LoadCode([.. converter.ByteCode]);
+        vm.Run();
+    }
+}
