@@ -20,7 +20,7 @@ public class Converter(Token[] _tokens)
         {
             if (Lexer.InstructionDictionary.TryGetValue(CurrentToken.Type.ToString(), out var tokenType) && Enum.TryParse<Instruction>(tokenType.ToString(), out var instruction))
             {
-                currentBytecodePart = new Operation(instruction, [], typeof(byte[]));
+                currentBytecodePart = new Operation(instruction, []);
                 Advance();
                 byteCode.Add(currentBytecodePart);
             }

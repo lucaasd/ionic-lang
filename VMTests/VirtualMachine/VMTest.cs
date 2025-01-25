@@ -16,7 +16,7 @@ public class VMTest
     {
         var vm = new IonicVM();
         List<IByteCodePart> code = [
-            new Operation(Instruction.PUSH, [1, 2, 3, 4], typeof(byte[]))
+            new Operation(Instruction.PUSH, [1, 2, 3, 4])
         ];
         vm.LoadCode(code);
         vm.Run();
@@ -29,7 +29,7 @@ public class VMTest
     {
         var vm = new IonicVM();
         List<IByteCodePart> code = [
-            new Operation(Instruction.PUSH, [10], typeof(byte))
+            new Operation(Instruction.PUSH, [10])
         ];
         vm.LoadCode(code);
         vm.Run();
@@ -42,8 +42,8 @@ public class VMTest
     {
         var vm = new IonicVM();
         List<IByteCodePart> code = [
-            new Operation(Instruction.PUSH, [1, 2, 3, 4], typeof(byte[])),
-            new Operation(Instruction.SUM, typeof(byte))
+            new Operation(Instruction.PUSH, [1, 2, 3, 4]),
+            new Operation(Instruction.SUM, [])
         ];
 
         vm.LoadCode(code);
@@ -57,7 +57,7 @@ public class VMTest
     {
         var vm = new IonicVM();
         List<IByteCodePart> code = [
-            new Operation(Instruction.AS, BitConverter.GetBytes(1), typeof(byte[]))
+            new Operation(Instruction.AS, BitConverter.GetBytes(1))
         ];
 
         vm.LoadCode(code);
@@ -70,8 +70,8 @@ public class VMTest
     {
         var vm = new IonicVM();
         List<IByteCodePart> code = [
-            new Operation(Instruction.PUSH, BitConverter.GetBytes(4), typeof(byte[])),
-            new Operation(Instruction.STORE, BitConverter.GetBytes(2), typeof(byte[]))
+            new Operation(Instruction.PUSH, BitConverter.GetBytes(4)),
+            new Operation(Instruction.STORE, BitConverter.GetBytes(2))
         ];
 
         vm.LoadCode(code);
@@ -96,9 +96,9 @@ public class VMTest
         int index = 0;
 
         List<IByteCodePart> code = [
-            new Operation(Instruction.PUSH, BitConverter.GetBytes(number), typeof(byte[])),
-            new Operation(Instruction.AS, BitConverter.GetBytes(type), typeof(byte[])),
-            new Operation(Instruction.STORE, BitConverter.GetBytes(index), typeof(byte[]))
+            new Operation(Instruction.PUSH, BitConverter.GetBytes(number)),
+            new Operation(Instruction.AS, BitConverter.GetBytes(type)),
+            new Operation(Instruction.STORE, BitConverter.GetBytes(index))
         ];
 
         vm.LoadCode(code);
