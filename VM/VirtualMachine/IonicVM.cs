@@ -1,7 +1,5 @@
 using System.Text;
 using VM.Instructions;
-using VM.Instructions.Declarations;
-using VM.AssemblyInfo.Validation;
 using VM.Runtime;
 using System.Runtime.InteropServices;
 using VM.Memory;
@@ -23,13 +21,13 @@ public class IonicVM
     private int programCounter;
     private int currentTypeIndex;
 
-    public int CurrentTypeIndex { get => currentTypeIndex; set => currentTypeIndex = value; }
-    public Frame CurrentFrame => currentFrame;
-
     private Stream stdoutStream;
     private Stream stderrStream;
     private Stream stdinStream;
 
+    public int ProgramCounter => programCounter;
+    public int CurrentTypeIndex { get => currentTypeIndex; set => currentTypeIndex = value; }
+    public Frame CurrentFrame => currentFrame;
     public Stack<byte>? Stack => currentFrame?.Stack;
 
     public static IonicVM CreateVM(VMBuilder builder)
@@ -51,7 +49,9 @@ public class IonicVM
             {Instruction.SUM, ExecuteSum},
             {Instruction.AS, ExecuteAs},
             {Instruction.STORE, ExecuteStore},
-            {Instruction.WRITE_STD, ExecuteWriteToStd}
+            {Instruction.WRITE_STD, ExecuteWriteToStd},
+            {Instruction.GOTO, ExecuteGoto},
+            {Instruction.NOP, ExecuteNop}
         };
     }
 
@@ -79,69 +79,23 @@ public class IonicVM
     {
         while (programCounter < code.Count)
         {
-            if (currentFunction is null)
+
+        }
+    }
+
+    public void RunSingle()
+    {
+        RunCode(code[programCounter]);
+    }
+
+    private void RunCode(IByteCodePart part)
+    {
+        if (currentFunction is null)
+        {
+            if (part is Operation)
             {
-                if (code[programCounter] is Operation)
-                {
-                    var operation = (code[programCounter] as Operation)!;
-
-                    var instruction = operation.Instruction;
-                    var operand = operation?.Operand;
-
-
-                    Execute(instruction, operand ?? []);
-                }
-                else if (code[programCounter] is FunctionDeclaration && currentFunction is null)
-                {
-                    var functionDeclaration = (code[programCounter] as FunctionDeclaration)!;
-
-                    var descriptor = functionDeclaration.Descriptor;
-
-                    var parsedDescriptor = DescriptorParser.Parse(descriptor);
-
-                    if (parsedDescriptor is not null)
-                    {
-                        currentFunction = new Function(functionDeclaration.Name, parsedDescriptor);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Descriptor {descriptor} is not valid");
-                    }
-
-                    programCounter++;
-                }
-                else if (code[programCounter] is Operation && currentFunction is not null)
-                {
-                    var operation = (code[programCounter] as Operation)!;
-
-                    if (operation.Instruction == Instruction.END)
-                    {
-                        functions.Add(currentFunction);
-                        currentFunction = null;
-                        programCounter++;
-                        continue;
-                    }
-
-                    currentFunction.Code.Add(operation);
-                    programCounter++;
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Instruction or Declaration {code[programCounter].GetType().Name} not exists");
-                }
-            }
-            else
-            {
-                if (code[programCounter] is Operation)
-                {
-                    var operation = (code[programCounter] as Operation)!;
-
-                    currentFunction?.Code.Add(operation);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Instruction {code[programCounter].GetType().Name} not exists");
-                }
+                var operation = (part as Operation)!;
+                Execute(operation.Instruction, operation.Operand);
             }
         }
     }
@@ -244,6 +198,17 @@ public class IonicVM
         targetFunctionArray[target]();
         int count = currentFrame.Stack.Count;
         currentFrame.Stack.Pop(count);
+        programCounter++;
+    }
+
+    private void ExecuteGoto(byte[] bytes)
+    {
+        var target = BitConverter.ToInt32(bytes);
+        programCounter = target;
+    }
+
+    private void ExecuteNop(byte[] _)
+    {
         programCounter++;
     }
 }
