@@ -106,9 +106,6 @@ public class VMTest
 
         byte[] numberBytes = BitConverter.GetBytes(number);
 
-        Console.WriteLine(string.Join(", ", vm.CurrentFrame.VariableMemory));
-        Console.WriteLine(string.Join(", ", numberBytes));
-
         Assert.Multiple(() =>
         {
             Assert.That(vm.CurrentFrame.VariableMemory.ToArray(), Is.EqualTo(numberBytes));

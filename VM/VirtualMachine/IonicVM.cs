@@ -191,8 +191,6 @@ public class IonicVM
         int index = BitConverter.ToInt32(bytes);
         int size = Marshal.SizeOf(primitiveTypes[currentTypeIndex]);
 
-        Console.WriteLine($"data size: {currentFrame.Stack.Count} type size: {size}");
-
         if (currentFrame.Stack.Count != size)
         {
             throw new Exception("Value size and type size must be the same!");
@@ -232,13 +230,14 @@ public class IonicVM
 
         Action[] targetFunctionArray = [
             () => {
+                WriteToStdin([..currentFrame.Stack.Reverse()], stdinStream);
+            },
+            () => {
                 WriteToStdout([..currentFrame.Stack.Reverse()], stdoutStream);
+
             },
             () => {
                 WriteToStderr([..currentFrame.Stack.Reverse()], stderrStream);
-            },
-            () => {
-                WriteToStdin([..currentFrame.Stack.Reverse()], stdinStream);
             }
         ];
 
