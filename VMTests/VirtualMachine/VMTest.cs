@@ -113,4 +113,20 @@ public class VMTest
             Assert.That(vm.CurrentFrame.Variables.Count, Is.EqualTo(1));
         });
     }
+
+    [Test]
+    public void TestGoto()
+    {
+        var vm = new IonicVM();
+
+        List<IByteCodePart> code = [
+            new Operation(Instruction.NOP, []),
+            new Operation(Instruction.GOTO, BitConverter.GetBytes(0))
+        ];
+
+        vm.LoadCode(code);
+        vm.RunSingle();
+        vm.RunSingle();
+        Assert.That(vm.ProgramCounter, Is.EqualTo(0));
+    }
 }
