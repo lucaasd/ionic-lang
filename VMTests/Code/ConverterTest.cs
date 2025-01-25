@@ -19,7 +19,7 @@ public class ConverterTests
         var code = converter.ByteCode;
 
         IByteCodePart[] expected = [
-            new Operation(Instruction.SUM, typeof(byte[]))
+            new Operation(Instruction.SUM, [])
         ];
 
         Assert.That(code, Is.EqualTo(expected));
@@ -40,7 +40,7 @@ public class ConverterTests
         var code = converter.ByteCode;
 
         IByteCodePart[] expected = [
-            new Operation(Instruction.PUSH, [10, 0, 0, 0, 0, 0, 0, 0], typeof(byte[]))
+            new Operation(Instruction.PUSH, [10, 0, 0, 0, 0, 0, 0, 0])
         ];
 
 
