@@ -79,7 +79,7 @@ public class IonicVM
     {
         while (programCounter < code.Count)
         {
-
+            RunCode(code[programCounter]);
         }
     }
 
