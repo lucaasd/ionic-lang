@@ -7,13 +7,13 @@ public class VMBuilder
         return new VMBuilder();
     }
 
-    private Stream stdoutStream;
-    private Stream stderrStream;
-    private Stream stdinStream;
+    private Stream? stdoutStream;
+    private Stream? stderrStream;
+    private Stream? stdinStream;
 
-    public Stream StdoutStream => stdoutStream;
-    public Stream StderrStream => stderrStream;
-    public Stream StdinStream => stdinStream;
+    public Stream? StdoutStream => stdoutStream;
+    public Stream? StderrStream => stderrStream;
+    public Stream? StdinStream => stdinStream;
 
     public VMBuilder ConfigureStdoutStream(Stream stream)
     {
