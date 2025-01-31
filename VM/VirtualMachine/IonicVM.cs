@@ -35,7 +35,8 @@ public class IonicVM
         return new IonicVM()
         {
             stderrStream = builder.StderrStream,
-            stdoutStream = builder.StdoutStream
+            stdoutStream = builder.StdoutStream,
+            stdinStream = builder.StdinStream
         };
     }
 
