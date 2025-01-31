@@ -21,9 +21,9 @@ public class IonicVM
     private int programCounter;
     private int currentTypeIndex;
 
-    private Stream stdoutStream;
-    private Stream stderrStream;
-    private Stream stdinStream;
+    private Stream? stdoutStream;
+    private Stream? stderrStream;
+    private Stream? stdinStream;
 
     public int ProgramCounter => programCounter;
     public int CurrentTypeIndex { get => currentTypeIndex; set => currentTypeIndex = value; }
@@ -181,6 +181,21 @@ public class IonicVM
         }
 
         var data = currentFrame.Stack.ToArray();
+
+        if (stdinStream is null)
+        {
+            throw new Exception("Stdin is null");
+        }
+
+        if (stdoutStream is null)
+        {
+            throw new Exception("Stdout is null");
+        }
+
+        if (stderrStream is null)
+        {
+            throw new Exception("Stderr is null");
+        }
 
         Action[] targetFunctionArray = [
             () => {
