@@ -24,6 +24,7 @@ public class Lexer(string code)
         {"AS", TokenType.AS},
         {"STORE", TokenType.STORE},
         {"WRITE_STD", TokenType.WRITE_STD},
+        {"GOTO", TokenType.GOTO},
         {"NOP", TokenType.NOP}
     };
 

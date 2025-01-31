@@ -9,7 +9,6 @@ public enum Instruction
     STORE,
     LOAD,
     RETURN,
-    END,
     INVOKE,
     AS,
     WRITE_STD

@@ -5,11 +5,15 @@ public enum TokenType
     // Identifiers
 
     PUSH,
-    SUM,
-    AS,
-    STORE,
-    WRITE_STD,
     NOP,
+    SUM,
+    GOTO,
+    STORE,
+    LOAD,
+    RETURN,
+    INVOKE,
+    AS,
+    WRITE_STD,
 
     // Types
 
